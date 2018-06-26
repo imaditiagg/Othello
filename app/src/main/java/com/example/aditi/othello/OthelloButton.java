@@ -4,37 +4,52 @@ import android.content.Context;
 import android.support.v7.widget.AppCompatButton;
 
 public class OthelloButton extends AppCompatButton {
-    private  int player;
+    private int row;
+    private int col;
+    private int value;
+    public boolean is_valid_move=false;
+    public boolean reveal =false;
 
     public OthelloButton(Context context) {
         super(context);
     }
 
-    public void setPlayer(int player)
+    public void setPlayerValue(int player,int value)
     {
-        this.player =player;
-        if(player == MainActivity.PLAYER_B) {
-            setBackground(getResources().getDrawable(R.drawable.black_bg));
+        this.reveal=true;
+        this.value =value;
+        if(value==0) {
+            setBackground(getResources().getDrawable(R.drawable.black_bg)); //black
 
         }
-        else if(player == MainActivity.PLAYER_W) {
-            setBackground(getResources().getDrawable(R.drawable.white_bg));
+        else if(value==1) {
+            setBackground(getResources().getDrawable(R.drawable.white_bg));//white
 
         }
-        setEnabled(false);
+        this.setEnabled(false);
     }
 
-    public int  getPlayer()
-    {
-        return this.player;
-    }
-    public boolean isEmpty()
-    {
-        if(this.player == MainActivity.NO_PLAYER)
-            return true;
-        else
-            return false;
-
+    public int getRow() {
+        return row;
     }
 
+    public int getCol() {
+        return col;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
 }
