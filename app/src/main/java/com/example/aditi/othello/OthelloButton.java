@@ -9,6 +9,7 @@ public class OthelloButton extends AppCompatButton {
     private int value;
     public boolean is_valid_move=false;
     public boolean reveal =false;
+    public int[] valid_direction = new int[8];
 
     public OthelloButton(Context context) {
         super(context);

@@ -125,42 +125,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void updateBoard(int row,int col){
+    public void updateBoard(int row,int col) {
 
-        for(int i=0;i<8;i++){
-            int a = row+x[i];
-            int b=col+y[i];
+        for (int i = 0; i < 8; i++) {
+            OthelloButton btn = board[row][col];
+            if (btn.valid_direction[i] == 1) {
 
-            if(a>=0&& b>=0 && a<size && b<size && board[a][b].reveal==true){
-                int c=a;
-                int d=b;
-                if(currentPlayer==PLAYER_B) {
-                    while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue() == 1) {
-                        //change the value i.e flip it
-                       // board[c][d].setPlayerValue(currentPlayer, 0);
-
-                            c = a + x[i];
-                            d = b + y[i];
-
-                            }
-
-                }
-                if(currentPlayer==PLAYER_W) {
-                    while (c >= 0 && d >= 0 && c < size && d < size &&board[c][d].reveal == true && board[c][d].getValue() == 0) {
-                        //change the value i.e flip it
-                        board[c][d].setPlayerValue(currentPlayer, 1);
+                int a = row + x[i];
+                int b = col + y[i];
+                if (a >= 0 && b >= 0 && a < size && b < size && board[a][b].reveal == true) {
+                    int c = a;
+                    int d = b;
+                    if (currentPlayer == PLAYER_B) {
+                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue() == 1) {
+                            //change the value i.e flip it
+                            board[c][d].setPlayerValue(currentPlayer, 0);
 
                             c = a + x[i];
                             d = b + y[i];
 
-
+                        }
 
                     }
+                    if (currentPlayer == PLAYER_W) {
+                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue() == 0) {
+                            //change the value i.e flip it
+                            board[c][d].setPlayerValue(currentPlayer, 1);
 
+                            c = a + x[i];
+                            d = b + y[i];
+
+
+                        }
+
+                    }
                 }
             }
-        }
 
+        }
     }
     public void setValidMoves()
     {
@@ -181,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 OthelloButton adj = board[a][b];
 
                                     for (int l = 0; l < 8; l++) {
-                                        if(flag1==0) {
+                                        flag1=0;
                                         int c = a + x[l];
                                         int d = b + y[l];
                                         int flag2=0;
@@ -200,8 +202,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             adj.is_valid_move = true;
                                             adj.setEnabled(true);
                                             adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
+                                            adj.valid_direction[l]=1;
                                         }
-                                    }
+
                                 }
                             }
                         }
@@ -239,6 +242,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             adj.is_valid_move = true;
                                             adj.setEnabled(true);
                                             adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
+                                            adj.valid_direction[l]=1;
                                         }
                                     }
                                 }
