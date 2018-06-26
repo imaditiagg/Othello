@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int PLAYER_W = 1;
     public static final int PLAYER_B = 0;
-    public static final int NO_PLAYER = -1;
 
     public static final int INCOMPLETE=1;
     public static final int PLAYER_W_WON=2;
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setUpBoard()
     {
         currentStatus=INCOMPLETE;
-        currentPlayer =PLAYER_B;
+        currentPlayer =PLAYER_B; //game starts with player_B
         rows = new ArrayList<>();
         board =new OthelloButton[size][size];
         rootLayout.removeAllViews();
@@ -116,9 +115,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for(int i=0;i<size;i++)
         {
             for(int j=0;j<size;j++){
-                if(board[i][j].is_valid_move==true)
+                if(board[i][j].is_valid_move) //if it's a valid move
                 {
-                    board[i][j].is_valid_move=false;
+                    board[i][j].is_valid_move=false; //make it invalid
                     board[i][j].setBackground(getResources().getDrawable(R.drawable.bg));
                 }
             }
@@ -133,11 +132,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 int a = row + x[i];
                 int b = col + y[i];
-                if (a >= 0 && b >= 0 && a < size && b < size && board[a][b].reveal == true) {
+                if (a >= 0 && b >= 0 && a < size && b < size && board[a][b].reveal) {
                     int c = a;
                     int d = b;
                     if (currentPlayer == PLAYER_B) {
-                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue() == 1) {
+                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue() == 1) {
                             //change the value i.e flip it
                             board[c][d].setPlayerValue(currentPlayer, 0);
 
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                     if (currentPlayer == PLAYER_W) {
-                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue() == 0) {
+                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue() == 0) {
                             //change the value i.e flip it
                             board[c][d].setPlayerValue(currentPlayer, 1);
 
@@ -173,10 +172,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             {
                 OthelloButton btn = board[i][j];
                 if(currentPlayer==PLAYER_B) {
-                    if (btn.reveal == true && btn.getValue()==1) { //if the button is revealed and it's white
+                    if (btn.reveal  && btn.getValue()==1) { //if the button is revealed and it's white
 
                         for (int k = 0; k < 8; k++) {
-                            int flag1=0;
+                            int flag1;
                             int a = i + x[k];
                             int b = j + y[k];
                             if (a >= 0 && a < size && b >= 0 && b < size && !board[a][b].reveal) {
@@ -187,22 +186,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int c = a + x[l];
                                         int d = b + y[l];
                                         int flag2=0;
-                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue()==1) {
+                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue()==1) {
 
                                             c += x[l];
                                             d += y[l];
                                             flag2=1;
 
                                         }
-                                        if (c >= 0 && d >= 0 && c < size && d < size && flag2==1 && board[c][d].reveal==true && board[c][d].getValue() == 0) {
+                                        if (c >= 0 && d >= 0 && c < size && d < size && flag2==1 && board[c][d].reveal && board[c][d].getValue() == 0) {
                                             flag1 = 1;
                                         }
 
                                         if (flag1 == 1) {
-                                            adj.is_valid_move = true;
-                                            adj.setEnabled(true);
-                                            adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
-                                            adj.valid_direction[l]=1;
+                                            //make it a valid move
+                                            if(adj.valid_direction[l]!=1) {
+                                                adj.is_valid_move = true;
+                                                adj.setEnabled(true);
+                                                adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
+                                                adj.valid_direction[l] = 1;
+                                            }
                                         }
 
                                 }
@@ -213,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 if(currentPlayer==PLAYER_W) {
-                    if (btn.reveal == true && btn.getValue()==0) { //if the button is revealed and it's black
+                    if (btn.reveal  && btn.getValue()==0) { //if the button is revealed and it's black
 
                         for (int k = 0; k < 8; k++) {
                             int flag1=0;
@@ -227,14 +229,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int c = a + x[l];
                                         int d = b + y[l];
                                         int flag2=0;
-                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal == true && board[c][d].getValue()==0) {
+                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue()==0) {
 
                                             c += x[l];
                                             d += y[l];
                                             flag2=1;
 
                                         }
-                                        if (c >= 0 && d >= 0 && c < size && d <size && flag2==1 && board[c][d].reveal==true && board[c][d].getValue() == 1) {
+                                        if (c >= 0 && d >= 0 && c < size && d <size && flag2==1 && board[c][d].reveal && board[c][d].getValue() == 1) {
                                             flag1 = 1;
                                         }
 
@@ -264,11 +266,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int count_B=0,count_W=0;
         for(int i=0;i<size;i++) {
             for (int j = 0; j < size; j++) {
-                    if(board[i][j].reveal==false)
+                    if(!board[i][j].reveal)
                         return;
             }
         }
 
+        //Won
         for(int i=0;i<size;i++){
             for(int j=0;j<size;j++){
 
@@ -283,17 +286,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(count_B>count_W){
             currentStatus=PLAYER_B_WON;
             Toast.makeText(this,"PLAYER_Black Won",Toast.LENGTH_LONG).show();
-            return;
         }
         else if(count_W>count_B){
             currentStatus=PLAYER_W_WON;
             Toast.makeText(this,"PLAYER_White Won",Toast.LENGTH_LONG).show();
-            return;
+
         }
         else if(count_B==count_W){
             currentStatus=DRAW;
             Toast.makeText(this,"DRAW",Toast.LENGTH_LONG).show();
-            return;
+
 
         }
 
