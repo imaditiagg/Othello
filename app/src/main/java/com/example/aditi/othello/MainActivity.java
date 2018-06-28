@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        if(count_B>32 || count_W>32) {
+
             if (count_B > count_W) {
                 currentStatus = PLAYER_B_WON;
             } else if (count_W > count_B) {
@@ -336,4 +336,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-}
+
