@@ -6,6 +6,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -48,6 +50,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setUpBoard();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.reset){
+            setUpBoard();
+        }
+        return true;
+    }
+
     public void setUpBoard()
     {
         currentStatus=INCOMPLETE;
@@ -95,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         board[3][3].setPlayerValue(WHITE);
         board[4][4].setPlayerValue(WHITE);
         board[4][3].setPlayerValue(BLACK);
+        clearprevValidMoves();
         setValidMoves();
 
     }
@@ -115,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             colClicked=button.getCol();
             updateBoard(rowClicked,colClicked);
             togglePlayer();
-            clearprevValidMoves(rowClicked,colClicked);
+            clearprevValidMoves();
             setValidMoves();
             checkGameStatus();
 
@@ -123,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-    public void clearprevValidMoves(int rowClicked,int colClicked)
+    public void clearprevValidMoves()
     {
         for(int i=0;i<size;i++)
         {
