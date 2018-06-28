@@ -15,15 +15,15 @@ public class OthelloButton extends AppCompatButton {
         super(context);
     }
 
-    public void setPlayerValue(int player,int value)
+    public void setPlayerValue(int value)
     {
         this.reveal=true;
         this.value =value;
-        if(value==0) {
+        if(value==MainActivity.BLACK) {
             setBackground(getResources().getDrawable(R.drawable.black_bg)); //black
 
         }
-        else if(value==1) {
+        else if(value==MainActivity.WHITE) {
             setBackground(getResources().getDrawable(R.drawable.white_bg));//white
 
         }

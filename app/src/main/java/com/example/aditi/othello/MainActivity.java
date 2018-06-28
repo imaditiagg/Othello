@@ -1,10 +1,16 @@
 package com.example.aditi.othello;
 
+import android.content.Context;
+import android.support.v4.app.NotificationCompatSideChannelService;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -12,6 +18,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int PLAYER_W = 1;
     public static final int PLAYER_B = 0;
+    public static final int BLACK=0;
+    public static final int WHITE=1;
 
     public static final int INCOMPLETE=1;
     public static final int PLAYER_W_WON=2;
@@ -22,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int colClicked;
     int[] x = {1,-1,1,-1,1,-1,0,0};
     int[] y = {0,0,1,-1,-1,1,1,-1};
+    LayoutInflater layoutInflater;
 
     LinearLayout rootLayout;
     private int size=8;
@@ -35,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rootLayout =findViewById(R.id.linearLayout);
+        layoutInflater =(LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
 
         setUpBoard();
     }
@@ -45,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rows = new ArrayList<>();
         board =new OthelloButton[size][size];
         rootLayout.removeAllViews();
+
         for(int i=0;i<size;i++)
         {
 
@@ -72,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 button.setRow(i);
                 button.setCol(j);
                 button.setEnabled(false);
+                button.setValue(-1);
 
 
 
@@ -79,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         //initial board setup
-        board[3][4].setPlayerValue(PLAYER_B,0);
-        board[3][3].setPlayerValue(PLAYER_W,1);
-        board[4][4].setPlayerValue(PLAYER_W,1);
-        board[4][3].setPlayerValue(PLAYER_B,0);
+        board[3][4].setPlayerValue(BLACK);
+        board[3][3].setPlayerValue(WHITE);
+        board[4][4].setPlayerValue(WHITE);
+        board[4][3].setPlayerValue(BLACK);
         setValidMoves();
 
     }
@@ -91,44 +103,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if(currentStatus==INCOMPLETE) {
-            clearprevValidMoves();
+
             OthelloButton button = (OthelloButton) view;
             if(currentPlayer == PLAYER_B) {
-                button.setPlayerValue(currentPlayer, 0);
+                button.setPlayerValue(BLACK);
             }
             else {
-                button.setPlayerValue(currentPlayer, 1);
+                button.setPlayerValue(WHITE);
             }
             rowClicked =button.getRow();
             colClicked=button.getCol();
             updateBoard(rowClicked,colClicked);
-
             togglePlayer();
+            clearprevValidMoves(rowClicked,colClicked);
             setValidMoves();
             checkGameStatus();
 
 
+
         }
     }
-    public void clearprevValidMoves()
+    public void clearprevValidMoves(int rowClicked,int colClicked)
     {
         for(int i=0;i<size;i++)
         {
             for(int j=0;j<size;j++){
-                if(board[i][j].is_valid_move) //if it's a valid move
-                {
-                    board[i][j].is_valid_move=false; //make it invalid
-                    board[i][j].setBackground(getResources().getDrawable(R.drawable.bg));
+                    OthelloButton btn = board[i][j];
+                    if (btn.is_valid_move && !btn.reveal) //if it was a valid move and not revealed yet
+                    {
+                        btn.is_valid_move = false; //make it invalid
+                        btn.setBackground(getResources().getDrawable(R.drawable.bg));
+                        btn.setEnabled(false);
+                        for (int k = 0; k < 8; k++) {
+                            btn.valid_direction[k] = 0; //re-initialize the valid_direction array
+                        }
+
+
                 }
             }
         }
     }
 
     public void updateBoard(int row,int col) {
-
+        OthelloButton btn = board[row][col]; //get the clicked button
+        //check in it's all the neighbours
         for (int i = 0; i < 8; i++) {
-            OthelloButton btn = board[row][col];
-            if (btn.valid_direction[i] == 1) {
+
+            if (btn.valid_direction[i] == 1) { //if the direction is valid
 
                 int a = row + x[i];
                 int b = col + y[i];
@@ -136,23 +157,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     int c = a;
                     int d = b;
                     if (currentPlayer == PLAYER_B) {
-                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue() == 1) {
-                            //change the value i.e flip it
-                            board[c][d].setPlayerValue(currentPlayer, 0);
+                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue() == WHITE) {
+                            //change the value of only white buttons i.e flip it
+                            board[c][d].setPlayerValue(BLACK);
 
-                            c = a + x[i];
-                            d = b + y[i];
+                            c = c + x[i];
+                            d = d + y[i];
 
                         }
 
                     }
                     if (currentPlayer == PLAYER_W) {
-                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue() == 0) {
-                            //change the value i.e flip it
-                            board[c][d].setPlayerValue(currentPlayer, 1);
+                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue() == BLACK) {
+                            //change the value of only black buttons i.e flip it
+                            board[c][d].setPlayerValue(WHITE);
 
-                            c = a + x[i];
-                            d = b + y[i];
+                            c = c + x[i];
+                            d = d + y[i];
 
 
                         }
@@ -165,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void setValidMoves()
     {
+        int flag1,flag2;
 
         for(int i=0;i<size;i++)
         {
@@ -172,39 +194,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             {
                 OthelloButton btn = board[i][j];
                 if(currentPlayer==PLAYER_B) {
-                    if (btn.reveal  && btn.getValue()==1) { //if the button is revealed and it's white
+                    if (btn.reveal  && btn.getValue()==WHITE) { //if the button is revealed and it's white
 
                         for (int k = 0; k < 8; k++) {
-                            int flag1;
+
                             int a = i + x[k];
                             int b = j + y[k];
-                            if (a >= 0 && a < size && b >= 0 && b < size && !board[a][b].reveal) {
-                                OthelloButton adj = board[a][b];
+                            if (a >= 0 && a < size && b >= 0 && b < size && !board[a][b].reveal) { //go to it's blank neighbours
+                                OthelloButton adj = board[a][b]; //adjacent blank neighbour
 
                                     for (int l = 0; l < 8; l++) {
                                         flag1=0;
+                                        flag2=0;
                                         int c = a + x[l];
                                         int d = b + y[l];
-                                        int flag2=0;
-                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue()==1) {
+                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue()==WHITE) {
 
                                             c += x[l];
                                             d += y[l];
                                             flag2=1;
 
                                         }
-                                        if (c >= 0 && d >= 0 && c < size && d < size && flag2==1 && board[c][d].reveal && board[c][d].getValue() == 0) {
+                                        if (c >= 0 && d >= 0 && c < size && flag2==1 && d < size && board[c][d].reveal && board[c][d].getValue() == BLACK) {
                                             flag1 = 1;
                                         }
 
                                         if (flag1 == 1) {
-                                            //make it a valid move
-                                            if(adj.valid_direction[l]!=1) {
+
                                                 adj.is_valid_move = true;
                                                 adj.setEnabled(true);
                                                 adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
                                                 adj.valid_direction[l] = 1;
-                                            }
                                         }
 
                                 }
@@ -214,42 +234,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
 
-                if(currentPlayer==PLAYER_W) {
-                    if (btn.reveal  && btn.getValue()==0) { //if the button is revealed and it's black
+               else if(currentPlayer==PLAYER_W) {
+                    if (btn.reveal  && btn.getValue()==BLACK) { //if the button is revealed and it's black
 
                         for (int k = 0; k < 8; k++) {
-                            int flag1=0;
                             int a = i + x[k];
                             int b = j + y[k];
-                            if (a >= 0 && a < size && b >= 0 && b < size && !board[a][b].reveal) {
+                            if (a >= 0 && a < size && b >= 0 && b < size && !board[a][b].reveal) { //go to it's blank neighbours
                                 OthelloButton adj = board[a][b];
 
                                 for (int l = 0; l < 8; l++) {
-                                    if(flag1==0) {
+
                                         int c = a + x[l];
                                         int d = b + y[l];
-                                        int flag2=0;
-                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue()==0) {
+                                        flag1=0;
+                                        flag2=0;
+                                        while (c >= 0 && d >= 0 && c < size && d < size && board[c][d].reveal && board[c][d].getValue()==BLACK) {
 
                                             c += x[l];
                                             d += y[l];
                                             flag2=1;
 
                                         }
-                                        if (c >= 0 && d >= 0 && c < size && d <size && flag2==1 && board[c][d].reveal && board[c][d].getValue() == 1) {
+                                        if (c >= 0 && d >= 0 && c < size && d <size && flag2==1 &&board[c][d].reveal && board[c][d].getValue() == WHITE) {
                                             flag1 = 1;
                                         }
 
-                                        if (flag1 == 1) {
-                                            adj.is_valid_move = true;
-                                            adj.setEnabled(true);
-                                            adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
-                                            adj.valid_direction[l]=1;
+                                        if (flag1 == 1  ) {
+
+                                                adj.is_valid_move = true;
+                                                adj.setEnabled(true);
+                                                adj.setBackground(getResources().getDrawable(R.drawable.green_dark_valid));
+                                                adj.valid_direction[l] = 1;
                                         }
                                     }
                                 }
                             }
-                        }
+
 
                     }
                 }
@@ -266,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int count_B=0,count_W=0;
         for(int i=0;i<size;i++) {
             for (int j = 0; j < size; j++) {
-                    if(!board[i][j].reveal)
+                    if(!board[i][j].reveal && board[i][j].is_valid_move) //if all the buttons are not revealed and there exists a valid move
                         return;
             }
         }
@@ -275,30 +296,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for(int i=0;i<size;i++){
             for(int j=0;j<size;j++){
 
-                if(board[i][j].getValue()==0)
+                if(board[i][j].getValue()==BLACK)
                     count_B++;
-                else
+                else if(board[i][j].getValue()==WHITE)
                     count_W++;
 
 
             }
         }
-        if(count_B>count_W){
-            currentStatus=PLAYER_B_WON;
-            Toast.makeText(this,"PLAYER_Black Won",Toast.LENGTH_LONG).show();
-        }
-        else if(count_W>count_B){
-            currentStatus=PLAYER_W_WON;
-            Toast.makeText(this,"PLAYER_White Won",Toast.LENGTH_LONG).show();
+
+        if(count_B>32 || count_W>32) {
+            if (count_B > count_W) {
+                currentStatus = PLAYER_B_WON;
+            } else if (count_W > count_B) {
+                currentStatus = PLAYER_W_WON;
+
+            } else if (count_B == count_W) {
+                currentStatus = DRAW;
+
+                }
+            final View output = layoutInflater.inflate(R.layout.alert_layout, null, false);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            TextView blk = output.findViewById(R.id.blackScore);
+            TextView white = output.findViewById(R.id.whiteScore);
+            TextView status = output.findViewById(R.id.status);
+            blk.setText(String.valueOf(count_B));
+            white.setText(String.valueOf(count_W));
+            if (currentStatus == PLAYER_B_WON) {
+                status.setText("BLACK PLAYER WON");
+            } else if (currentStatus == PLAYER_W_WON)
+                status.setText("WHITE PLAYER WON");
+            else
+                status.setText("DRAW");
+
+            builder.setView(output);
+            AlertDialog dialog = builder.create(); //show the dialog
+            dialog.show();
 
         }
-        else if(count_B==count_W){
-            currentStatus=DRAW;
-            Toast.makeText(this,"DRAW",Toast.LENGTH_LONG).show();
-
-
-        }
-
     }
 
 }
