@@ -5,12 +5,15 @@ import android.support.v4.app.NotificationCompatSideChannelService;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.menu.ListMenuItemView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int[] x = {1,-1,1,-1,1,-1,0,0};
     int[] y = {0,0,1,-1,-1,1,1,-1};
     LayoutInflater layoutInflater;
+    TextView tv1,tv2;
 
     LinearLayout rootLayout;
     private int size=8;
@@ -73,6 +77,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rows = new ArrayList<>();
         board =new OthelloButton[size][size];
         rootLayout.removeAllViews();
+
+        LinearLayout l = new LinearLayout(this);
+        LinearLayout  l1 = new LinearLayout(this);
+        LinearLayout l2 = new LinearLayout(this);
+        LinearLayout.LayoutParams param1 = new LinearLayout.LayoutParams(0,170,1);
+
+        LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(0,170,1);
+
+        l1.setBackground(getResources().getDrawable(R.drawable.ll_bg));
+        l2.setBackground(getResources().getDrawable(R.drawable.ll_bg));
+        l1.setLayoutParams(param1);
+        l2.setLayoutParams(param2);
+
+        ImageView img1 = new ImageView(this);
+        img1.setImageDrawable(getResources().getDrawable(R.drawable.black));
+        LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(0,170,1);
+        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(0,140,1);
+        img1.setLayoutParams(layoutParams1);
+        tv1 = new TextView(this);
+        layoutParams2.setMargins(0,20,0,0);
+        tv1.setLayoutParams(layoutParams2);
+        tv1.setText("2");
+        tv1.setTextSize(TypedValue.COMPLEX_UNIT_PX, 100);
+        l1.setOrientation(LinearLayout.HORIZONTAL);
+        l1.addView(img1);
+        l1.addView(tv1);
+
+        ImageView img2 = new ImageView(this);
+        img2.setImageDrawable(getResources().getDrawable(R.drawable.white));
+        LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(0,170,1);
+        LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(0,140,1);
+        img2.setLayoutParams(layoutParams3);
+        tv2 = new TextView(this);
+        layoutParams4.setMargins(0,20,0,0);
+        tv2.setLayoutParams(layoutParams4);
+        tv2.setText("2");
+        tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, 100);
+        l2.setOrientation(LinearLayout.HORIZONTAL);
+        l2.addView(img2);
+        l2.addView(tv2);
+        l.addView(l1);
+        l.addView(l2);
+
+
+        rootLayout.addView(l);
+
 
         for(int i=0;i<size;i++)
         {
@@ -133,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             rowClicked =button.getRow();
             colClicked=button.getCol();
             updateBoard(rowClicked,colClicked);
+            updatecount();
             togglePlayer();
             clearprevValidMoves();
             setValidMoves();
@@ -142,6 +193,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+    public void updatecount(){
+        int count_B=0,count_W=0;
+        for(int i=0;i<size;i++)
+            {
+                for(int j=0;j<size;j++){
+                    if(board[i][j].getValue()==BLACK){
+                        count_B++;
+                    }
+                    else if(board[i][j].getValue()==WHITE) {
+                        count_W++;
+                    }
+
+                }
+            }
+
+            tv1.setText(String.valueOf(count_B));
+            tv2.setText(String.valueOf(count_W));
+
+
+        }
+
     public void clearprevValidMoves()
     {
         for(int i=0;i<size;i++)
